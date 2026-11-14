@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro 
+      name="wheel" 
+      params="side wheel_width wheel_radius wheel_separation">
+    
+    <xacro:property name="wheel_y_offset" value="${(-wheel_separation /  2) if side == 'left' else (wheel_separation / 2)}"/>
+
+    <link name="${side}_wheel_link">
+      <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+        
+        <geometry>
+          <cylinder
+            radius="${wheel_radius}"
+            length="${wheel_width}"/>
+        </geometry>
+
+        <material name="rubber_black"/>
+      </visual>
+    </link>
+
+    <joint name="${side}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      
+      <child link="${side}_wheel_link"/>
+
+      <origin xyz="0 ${wheel_y_offset} 0" rpy="${-pi / 2} 0 0"/>
+
+      <axis xyz="0 0 1"/>
+    </joint>
+  </xacro:macro>
+</robot>
+

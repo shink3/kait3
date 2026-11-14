@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+  <!-- References:
+    - Livox Mid-360S User Manual 
+      url: https://terra-1-g.djicdn.com/65c028cd298f4669a7f0e40e50ba1131/Mid-360S/UM/20260601/Livox_Mid-360s_User_Manual_en.pdf
+      page: 16, 19, 22
+  -->
+
+  <xacro:macro
+    name="livox_mid360s" 
+    params="side reference_point_x separation lidar_origin_z">
+
+    <xacro:property name="livox_imu_offset_x" value="11.0e-3"/>
+    <xacro:property name="livox_imu_offset_y" value="23.29e-3"/>
+    <xacro:property name="livox_imu_offset_z" value="-44.12e-3"/>
+
+    <xacro:property name="lidar_origin_z_to_lidar_bottom_distance" value="47.0e-3"/>
+    <!-- According to the User Manual, the dimension is 65.0 +/- 0.5 mm. 
+        However, the measured value was 64.0 mm, so the measured value used
+    -->
+    <xacro:property name="lidar_lower_body_length" value="64.0e-3"/>
+
+    <xacro:property name="mount_plate_length" value="100.0e-3"/>
+    <xacro:property name="mount_plate_width" value="80.0e-3"/>
+    <xacro:property name="mount_plate_height" value="5.0e-3"/>
+    <xacro:property name="mount_plate_offset_x" value="${-(mount_plate_length / 2) + (lidar_lower_body_length / 2)}"/>
+    <xacro:property name="mount_plate_offset_y" value="0.0"/>
+    <xacro:property name="mount_plate_offset_z" value="${-lidar_origin_z_to_lidar_bottom_distance - (mount_plate_height / 2)}"/>
+
+    <xacro:property 
+      name="lidar_origin_x" 
+      value="${(reference_point_x + (separation / 2)) if side == 'front' else (reference_point_x - (separation / 2))}"/>
+    <xacro:property name="lidar_origin_y" value="0.0"/>
+
+    <xacro:property name="pitch" value="${-pi}"/>
+    <xacro:property name="yaw" value="${0.0 if side == 'front' else pi}"/> 
+
+    <link name="${side}_lidar_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+
+        <geometry>
+          <mesh filename="package://kait3_description/meshes/livox_mid360s.stl" scale="1e-3 1e-3 1e-3"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+		 
+      <visual>
+        <origin 
+            xyz="${mount_plate_offset_x} ${mount_plate_offset_y} ${mount_plate_offset_z}"
+          rpy="0 0 0"/>
+
+        <geometry>
+          <box size="${mount_plate_length} ${mount_plate_width} ${mount_plate_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+
+    <link name="${side}_imu_link" />
+
+    <joint name="${side}_lidar_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${side}_lidar_link"/>
+
+      <origin 
+          xyz="${lidar_origin_x} ${lidar_origin_y} ${lidar_origin_z}"
+          rpy="${pitch} 0 ${yaw}"/>
+
+    </joint>
+    
+    <joint name="${side}_imu_joint" type="fixed">
+        <parent link="${side}_lidar_link"/>
+        <child link="${side}_imu_link"/>
+
+        <origin 
+            xyz="${livox_imu_offset_x} ${livox_imu_offset_y} ${livox_imu_offset_z}"
+            rpy="0 0 0"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

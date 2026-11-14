@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+ 
+  <xacro:macro 
+    name="chassis" 
+    params="
+      wheel_radius 
+      lower_body_length lower_body_width lower_body_height lower_body_origin_x lower_body_origin_y lower_body_origin_z
+      upper_body_radius upper_body_length upper_body_origin_x upper_body_origin_y upper_body_origin_z
+      neck_length neck_width neck_height neck_origin_x neck_origin_y neck_origin_z
+      head_plate_length head_plate_width head_plate_height head_plate_origin_x head_plate_origin_y head_plate_origin_z
+      ext_pole_length ext_pole_width ext_pole_height ext_pole_origin_x ext_pole_origin_y ext_pole_origin_z">
+    <link name="base_footprint"/>
+
+    <link name="base_link">
+      <visual>
+        <origin
+          xyz="${lower_body_origin_x} ${lower_body_origin_y} ${lower_body_origin_z}"
+          rpy="0 0 0"/>
+
+        <geometry>
+          <box size="${lower_body_length} ${lower_body_width} ${lower_body_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+
+      <visual>
+        <origin
+          xyz="${upper_body_origin_x} ${upper_body_origin_y} ${upper_body_origin_z}"
+          rpy="0 0 0"/>
+
+        <geometry>
+          <cylinder radius="${upper_body_radius}" length="${upper_body_length}"/>
+        </geometry>
+
+        <material name="silver"/> 
+      </visual>
+
+      <visual>
+        <origin 
+          xyz="${neck_origin_x} ${neck_origin_y} ${neck_origin_z}"
+          rpy="0 0 0"/>
+        
+        <geometry>
+          <box size="${neck_length} ${neck_width} ${neck_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+      
+      <visual>
+        <origin
+          xyz="${head_plate_origin_x} ${head_plate_origin_y} ${head_plate_origin_z}" 
+          rpy="0 0 0"/>
+
+        <geometry>
+          <box size="${head_plate_length} ${head_plate_width} ${head_plate_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+
+      <visual>
+        <origin 
+          xyz="${ext_pole_origin_x} ${ext_pole_origin_y} ${ext_pole_origin_z}"
+          rpy="0 0 0"/>
+
+        <geometry>
+          <box size="${ext_pole_length} ${ext_pole_width} ${ext_pole_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+    
+    <joint name="base_joint" type="fixed">
+      <parent link="base_footprint"/>
+      
+      <child link="base_link"/>
+    
+      <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0 "/>
+    </joint>
+  </xacro:macro>
+</robot>
+

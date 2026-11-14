@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Reference:
+    - realsense-ros.
+      url: https://github.com/realsenseai/realsense-ros/blob/ros2-master/realsense2_description/urdf/_d435.urdf.xacro -->
+
+  <xacro:macro
+    name="realsense_d435i"
+    params="
+      pan_origin_x pan_origin_y pan_origin_z
+      tilt_offset_from_pan_x tilt_offset_from_pan_y tilt_offset_from_pan_z
+      pan_angle:=0 tilt_angle:=0 stand_angle:=-30">
+
+    <xacro:property name="d435_cam_width" value="90.0e-3"/>
+    <xacro:property name="d435_cam_height" value="25.0e-3"/>
+    <xacro:property name="d435_cam_depth" value="25.05e-3"/>
+    <xacro:property name="d435_cam_mount_from_center_offset" value="14.9e-3"/>
+    <xacro:property name="d435_glass_to_front" value="0.1e-3"/>
+    <xacro:property name="d435_zero_depth_to_glass" value="4.2e-3"/>
+    <xacro:property name="d435_mesh_x_offset" value="${d435_cam_mount_from_center_offset - d435_glass_to_front - d435_zero_depth_to_glass}"/>
+
+    <xacro:property name="d435_cam_depth_px" value="${d435_cam_mount_from_center_offset}"/>
+    <xacro:property name="d435_cam_depth_py" value="17.5e-3"/>
+    <xacro:property name="d435_cam_depth_pz" value="${d435_cam_height / 2}"/>
+    
+
+    <xacro:property name="camera_bottom_screw_offset_x" value="26.0e-3"/>
+    <xacro:property name="camera_bottom_screw_offset_y" value="0.0"/>
+    <xacro:property name="camera_bottom_screw_offset_z" value="43.0e-3"/>
+
+    <xacro:property name="head_length" value="75.0e-3"/>
+    <xacro:property name="head_width" value="41.0e-3"/>
+    <xacro:property name="head_height" value="15.0e-3"/>
+
+    <xacro:property name="pole_length" value="20.0e-3"/>
+    <xacro:property name="pole_width" value="20.0e-3"/>
+    <xacro:property name="pole_height" value="${camera_bottom_screw_offset_z - head_height}"/>
+
+    <xacro:property name="stand_length" value="30.0e-3"/>
+    <xacro:property name="stand_width" value="20.0e-3"/>
+    <xacro:property name="stand_height" value="100.0e-3"/>
+
+    <link name="camera_bottom_screw_frame">
+      <visual>
+        <origin xyz="0 0 ${-head_height / 2}" rpy="0 0 0"/>
+
+        <geometry>
+          <box size="${head_length} ${head_width} ${head_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+
+    <link name="camera_link">
+      <visual>
+        <origin
+          xyz="${d435_zero_depth_to_glass + d435_glass_to_front} ${-d435_cam_depth_py} 0"
+          rpy="${pi / 2} 0 ${pi / 2}"/>
+
+        <geometry>
+          <mesh filename="package://kait3_description/meshes/realsense_d435i.stl" scale="1e-3 1e-3 1e-3"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+
+    <link name="pan_link">
+      <visual>
+        <origin xyz="0 0 ${-stand_length}" rpy="0 0 0"/>
+
+        <geometry>
+          <box size="${stand_length} ${stand_width} ${stand_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+
+    <link name="tilt_link">
+      <visual>
+        <origin xyz="0 0 ${pole_height / 2}" rpy="0 0 0"/>
+    
+        <geometry>
+          <box size="${pole_length} ${pole_width} ${pole_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+
+    <joint name="pan_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="pan_link"/>
+      <origin 
+        xyz="${pan_origin_x} ${pan_origin_y} ${pan_origin_z}"
+        rpy="0 ${radians(stand_angle)} ${radians(pan_angle)}"/>
+    </joint>
+
+    <joint name="tilt_joint" type="fixed">
+      <parent link="pan_link"/>
+      <child link="tilt_link"/>
+      <origin
+        xyz="${tilt_offset_from_pan_x} ${tilt_offset_from_pan_y} ${tilt_offset_from_pan_z}"
+        rpy="0 ${radians(-stand_angle + tilt_angle)} 0"/>
+    </joint>
+
+    <joint name="camera_bottom_screw_joint" type="fixed">
+      <parent link="tilt_link"/>
+      <child link="camera_bottom_screw_frame"/>
+      <origin
+        xyz="${camera_bottom_screw_offset_x} ${camera_bottom_screw_offset_y} ${camera_bottom_screw_offset_z}"
+        rpy="0 0 0"/>
+    </joint>
+
+    <joint name="camera_joint" type="fixed">
+      <parent link="camera_bottom_screw_frame"/>
+      <child link="camera_link"/>
+      <origin
+        xyz="${d435_mesh_x_offset} ${d435_cam_depth_py} ${d435_cam_depth_pz}"
+        rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+</robot>
+          

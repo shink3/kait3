@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="mock.urdf.xacro"/>
+  <xacro:include filename="roboclaw.urdf.xacro"/>
+
+  <xacro:macro name="motor_driver" params="wheel_radius mock:=false">  
+    <xacro:if value="${mock}">
+      <xacro:mock_ros2_control/>
+    </xacro:if>
+
+    <xacro:unless value="${mock}">
+      <xacro:roboclaw_ros2_control wheel_radius="${wheel_radius}"/>
+    </xacro:unless>
+  </xacro:macro>
+</robot>

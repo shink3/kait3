@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- References: 
+    - realsense-ros,  
+      URL: https://github.com/realsenseai/realsense-ros/blob/3.2.2/realsense2_description/urdf/_l515.urdf.xacro
+   
+    - Intel Realsense LiDAR Camera L515 Datasheet Rev 003
+      url: https://realsenseai.com/wp-content/uploads/2025/06/Intel_RealSense_LiDAR_L515_Datasheet_Rev003.pdf
+      page: 19
+  -->
+    <xacro:macro 
+      name="realsense_l515" 
+      params="
+        pan_origin_x pan_origin_y pan_origin_z
+        tilt_offset_from_pan_x tilt_offset_from_pan_y tilt_offset_from_pan_z
+        pan_angle:=0 tilt_angle:=0 stand_angle:=-30">
+        
+    <xacro:property name="l515_cam_mount_from_glass_offset" value="12.0e-3"/>
+    <xacro:property name="l515_zero_depth_to_glass" value="4.50e-3"/>
+    <xacro:property name="l515_depth_x_offset_from_mount" value="${l515_cam_mount_from_glass_offset - l515_zero_depth_to_glass}"/>
+
+    <xacro:property name="l515_cam_depth_px" value="${l515_depth_x_offset_from_mount}"/>
+    <xacro:property name="l515_cam_depth_py" value="0.0"/>
+    <xacro:property name="l515_cam_center" value="30.15e-3"/>
+    <xacro:property name="l515_cam_center_to_transmitter_pz" value="1e-3"/>
+    <xacro:property name="l515_cam_transmitter_to_depth_pz" value="-10.0e-3"/>
+    <xacro:property 
+      name="l515_cam_depth_pz" 
+      value="${l515_cam_center + l515_cam_center_to_transmitter_pz + l515_cam_transmitter_to_depth_pz}"/>
+    <xacro:property 
+      name="l515_cam_center_to_depth_pz" 
+      value="${l515_cam_center_to_transmitter_pz + l515_cam_transmitter_to_depth_pz}"/>
+
+    <xacro:property name="camera_bottom_screw_offset_x" value="26.0e-3"/>
+    <xacro:property name="camera_bottom_screw_offset_y" value="0.0"/>
+    <xacro:property name="camera_bottom_screw_offset_z" value="43.0e-3"/>
+
+    <xacro:property name="head_length" value="75.0e-3"/>
+    <xacro:property name="head_width" value="41.0e-3"/>
+    <xacro:property name="head_height" value="15.0e-3"/>
+
+    <xacro:property name="pole_length" value="20.0e-3"/>
+    <xacro:property name="pole_width" value="20.0e-3"/>
+    <xacro:property name="pole_height" value="${camera_bottom_screw_offset_z - head_height}"/>
+
+    <xacro:property name="stand_length" value="30.0e-3"/>
+    <xacro:property name="stand_width" value="20.0e-3"/>
+    <xacro:property name="stand_height" value="100.0e-3"/>
+
+    <link name="camera_bottom_screw_frame">
+      <visual>
+        <origin xyz="0 0 ${-head_height / 2}" rpy="0 0 0"/>
+        
+        <geometry>
+          <box size="${head_length} ${head_width} ${head_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+
+    </link>
+    
+    <link name="camera_link">
+      <visual>
+        <origin
+          xyz="${l515_zero_depth_to_glass} 0 ${-l515_cam_center_to_depth_pz}" 
+          rpy="${pi / 2} 0 ${pi / 2}"/>
+
+        <geometry>
+         <mesh filename="package://kait3_description/meshes/intel_realsense_l515.stl" scale="1e-3 1e-3 1e-3"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+
+    </link>
+
+    <link name="pan_link">
+      <visual>
+        <origin xyz="0 0 ${-stand_length}" rpy="0 0 0"/>
+        
+        <geometry>
+          <box size="${stand_length} ${stand_width} ${stand_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+
+    <link name="tilt_link">
+      <visual>
+        <origin xyz="0 0 ${pole_height / 2}" rpy="0 0 0"/>
+
+        <geometry>
+          <box size="${pole_length} ${pole_width} ${pole_height}"/>
+        </geometry>
+
+        <material name="silver"/>
+      </visual>
+    </link>
+
+    <joint name="pan_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="pan_link"/>
+      <origin
+          xyz="${pan_origin_x} ${pan_origin_y} ${pan_origin_z}"
+          rpy="0 ${radians(stand_angle)} ${radians(pan_angle)}"/>
+    </joint>
+
+    <joint name="tilt_joint" type="fixed">
+      <parent link="pan_link"/>
+      <child link="tilt_link"/>
+      <origin 
+        xyz="${tilt_offset_from_pan_x} ${tilt_offset_from_pan_y} ${tilt_offset_from_pan_z}"
+        rpy="0 ${radians(-stand_angle + tilt_angle)} 0"/>
+    </joint>
+
+    <joint name="camera_bottom_screw_joint" type="fixed">
+      <parent link="tilt_link"/>
+      <child link="camera_bottom_screw_frame"/>
+      <origin 
+        xyz="${camera_bottom_screw_offset_x} ${camera_bottom_screw_offset_y} ${camera_bottom_screw_offset_z}" 
+        rpy="0 0 0"/>
+    </joint>
+    
+    <joint name="camera_joint" type="fixed">
+      <parent link="camera_bottom_screw_frame"/>
+      <child link="camera_link"/>
+      <origin
+        xyz="${l515_cam_depth_px} ${l515_cam_depth_py} ${l515_cam_depth_pz}"
+        rpy="0 0 0"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

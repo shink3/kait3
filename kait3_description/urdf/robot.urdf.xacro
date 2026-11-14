@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<robot name="kait3" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="mock_hardware" default="false"/>
+
+  <xacro:include filename="$(find kait3_description)/urdf/components/materials.urdf.xacro"/>
+  <xacro:include filename="$(find kait3_description)/urdf/components/chassis.urdf.xacro"/>
+  <xacro:include filename="$(find kait3_description)/urdf/components/wheel.urdf.xacro"/>
+  <xacro:include filename="$(find kait3_description)/urdf/components/livox_mid360s.urdf.xacro"/>
+  <xacro:include filename="$(find kait3_description)/urdf/components/realsense_d435i.urdf.xacro"/>
+  <xacro:include filename="$(find kait3_description)/urdf/ros2_control/hardware.urdf.xacro"/>
+
+  <xacro:property name="wheel_width" value="25.0e-3"/>
+  <xacro:property name="wheel_radius" value="231.0e-3"/>
+  <xacro:property name="wheel_separation" value="526.0e-3"/>
+
+  <xacro:property name="lower_front_to_base_x_distance" value="104.0e-3"/>
+  <xacro:property name="base_z_to_lower_bottom_distance" value="61.0e-3"/>
+
+  <xacro:property name="lower_body_length" value="700.0e-3"/>
+  <xacro:property name="lower_body_width" value="405.0e-3"/>
+  <xacro:property name="lower_body_height" value="225.0e-3"/>
+  <xacro:property name="lower_body_origin_x" value="${-(lower_body_length / 2) + lower_front_to_base_x_distance}"/>
+  <xacro:property name="lower_body_origin_y" value="0.0"/>
+  <xacro:property name="lower_body_origin_z" value="${(lower_body_height / 2) - base_z_to_lower_bottom_distance}"/>
+  　
+  <xacro:property name="lower_front_to_upper_side_distance" value="32.0e-3"/>
+
+  <xacro:property name="upper_body_radius" value="200.0e-3"/>
+  <xacro:property name="upper_body_length" value="225.0e-3"/>
+  <xacro:property 
+    name="upper_body_origin_x" 
+      value="${-upper_body_radius + (lower_front_to_base_x_distance - lower_front_to_upper_side_distance)}"/>
+  <xacro:property name="upper_body_origin_y" value="0.0"/>
+  <xacro:property name="upper_body_origin_z" value="${(lower_body_height / 2) + lower_body_origin_z + (upper_body_length / 2)}"/>
+  
+  <xacro:property name="neck_length" value="20.0e-3"/>
+  <xacro:property name="neck_width" value="20.0e-3"/>
+  <xacro:property name="neck_height" value="130.0e-3"/>
+  <xacro:property name="neck_origin_x" value="${upper_body_origin_x}"/>
+  <xacro:property name="neck_origin_y" value="0.0"/>
+  <xacro:property name="neck_origin_z" value="${(upper_body_length / 2) + upper_body_origin_z + (neck_height / 2)}"/>
+
+  <xacro:property name="head_plate_length" value="270e-3"/>
+  <xacro:property name="head_plate_width" value="270e-3"/>
+  <xacro:property name="head_plate_height" value="20e-3"/>
+  <xacro:property name="head_plate_origin_x" value="${neck_origin_x}"/>
+  <xacro:property name="head_plate_origin_y" value="0"/>
+  <xacro:property name="head_plate_origin_z" value="${(neck_height / 2) + neck_origin_z + (head_plate_height / 2)}"/>
+
+  <xacro:property name="ext_pole_bottom_to_lower_bottom_distance" value="85.0e-3"/>
+
+  <xacro:property name="ext_pole_length" value="180.0e-3"/>
+  <xacro:property name="ext_pole_width" value="20.0e-3"/>
+  <xacro:property name="ext_pole_height" value="20.0e-3"/>
+  <xacro:property name="ext_pole_origin_x" value="${(ext_pole_length / 2) + lower_front_to_base_x_distance}"/>
+  <xacro:property name="ext_pole_origin_y" value="0.0"/>
+  <xacro:property 
+    name="ext_pole_origin_z" 
+    value="${(ext_pole_bottom_to_lower_bottom_distance - base_z_to_lower_bottom_distance) + (ext_pole_height / 2)}"/>
+
+  <xacro:property name="lidar_separation" value="236.0e-3"/>
+  <xacro:property name="lidar_origin_to_head_plate_bottom_distance" value="52.0e-3"/>
+  <xacro:property 
+    name="lidar_origin_z" 
+    value="${head_plate_origin_z - (head_plate_height / 2) - lidar_origin_to_head_plate_bottom_distance}" /> 
+    
+  <xacro:property name="tilt_origin_x_to_lower_front_distance" value="130.0e-3"/>
+  <xacro:property name="tilt_origin_z_to_ext_pole_top_distance" value="45.0e-3"/>
+
+  <xacro:property name="tilt_origin_x" value="${lower_front_to_base_x_distance + tilt_origin_x_to_lower_front_distance}"/>
+  <xacro:property name="tilt_origin_y" value="0.0"/>
+  <xacro:property 
+    name="tilt_origin_z"
+    value="${ext_pole_origin_z + (ext_pole_height / 2) + tilt_origin_z_to_ext_pole_top_distance}"/>
+
+  <xacro:chassis 
+      wheel_radius="${wheel_radius}"
+      lower_body_length="${lower_body_length}" 
+      lower_body_width="${lower_body_width}" 
+      lower_body_height="${lower_body_height}"
+      lower_body_origin_x="${lower_body_origin_x}" 
+      lower_body_origin_y="${lower_body_origin_y}" 
+      lower_body_origin_z="${lower_body_origin_z}"
+      upper_body_radius="${upper_body_radius}"
+      upper_body_length="${upper_body_length}"
+      upper_body_origin_x="${upper_body_origin_x}"
+      upper_body_origin_y="${upper_body_origin_y}"
+      upper_body_origin_z="${upper_body_origin_z}"
+      neck_length="${neck_length}"
+      neck_width="${neck_width}"
+      neck_height="${neck_height}"
+      neck_origin_x="${neck_origin_x}"
+      neck_origin_y="${neck_origin_y}"
+      neck_origin_z="${neck_origin_z}"
+      head_plate_length="${head_plate_length}"
+      head_plate_width="${head_plate_width}"
+      head_plate_height="${head_plate_height}"
+      head_plate_origin_x="${head_plate_origin_x}"
+      head_plate_origin_y="${head_plate_origin_y}"
+      head_plate_origin_z="${head_plate_origin_z}"
+      ext_pole_length="${ext_pole_length}"
+      ext_pole_width="${ext_pole_width}"
+      ext_pole_height="${ext_pole_height}"
+      ext_pole_origin_x="${ext_pole_origin_x}"
+      ext_pole_origin_y="${ext_pole_origin_y}"
+      ext_pole_origin_z="${ext_pole_origin_z}"/>
+
+  <xacro:wheel
+      side="left"
+      wheel_width="${wheel_width}"
+      wheel_radius="${wheel_radius}"
+      wheel_separation="${wheel_separation}"/>
+
+  <xacro:wheel
+      side="right"
+      wheel_width="${wheel_width}"
+      wheel_radius="${wheel_radius}"
+      wheel_separation="${wheel_separation}"/>
+
+  <xacro:livox_mid360s
+    side="front"
+    reference_point_x="${neck_origin_x}"
+    separation="${lidar_separation}"
+    lidar_origin_z="${lidar_origin_z}"/>
+
+  <xacro:livox_mid360s
+    side="rear"
+    reference_point_x="${neck_origin_x}"
+    separation="${lidar_separation}"
+    lidar_origin_z="${lidar_origin_z}"/>
+  
+   <!-- 
+      The physical camera stand has a pan joint, but it is not used in this system,
+      so, the pan_link is kept for for future use and placed at the same posiiton as tilt_link, 
+      tilted 0 degrees.
+   -->
+  <xacro:realsense_d435i
+    pan_origin_x="${tilt_origin_x}"
+    pan_origin_y="${tilt_origin_y}"
+    pan_origin_z="${tilt_origin_z}"
+    tilt_offset_from_pan_x="0"
+    tilt_offset_from_pan_y="0"
+    tilt_offset_from_pan_z="0"
+    tilt_angle="0"/>
+
+  <xacro:motor_driver wheel_radius="${wheel_radius}" mock="$(arg mock_hardware)"/>
+</robot>
