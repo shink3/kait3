@@ -2,8 +2,6 @@
 #define KAIT3_ROBOCLAW_HARDWARE_DRIVER_PACKET_HPP_
 
 #include "kait3_roboclaw_hardware/util/bit_conv.hpp"
-#include <cstddef>
-#include <cstdint>
 #include <cstring>
 #include <tuple>
 #include <vector>

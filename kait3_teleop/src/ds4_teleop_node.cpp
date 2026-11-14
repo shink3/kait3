@@ -1,8 +1,4 @@
 #include "kait3_teleop/ds4_teleop_node.hpp"
-#include "kait3_teleop/ds4_feedback_interface.hpp"
-#include <rclcpp/callback_group.hpp>
-#include <rclcpp/parameter_value.hpp>
-#include <stdexcept>
 #include <unordered_set>
 
 namespace kait3_teleop {

@@ -5,7 +5,6 @@
 #include "kait3_roboclaw_hardware/driver/packet.hpp"
 #include "kait3_roboclaw_hardware/driver/crc16.hpp"
 #include "kait3_roboclaw_hardware/driver/exceptions.hpp"
-#include <cstdint>
 #include <exception>
 #include <stdexcept>
 #include <string>

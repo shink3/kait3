@@ -1,7 +1,5 @@
 #include "kait3_roboclaw_hardware/roboclaw_hardware.hpp"
-#include <algorithm>
 #include <rcutils/macros.h>
-#include <string>
 
 namespace kait3_roboclaw_hardware {
         
