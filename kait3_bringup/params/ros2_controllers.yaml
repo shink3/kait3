@@ -37,8 +37,8 @@ diff_drive_controller:
         min_jerk: .nan
     angular:
       z:
-        max_velocity: .nan
-        min_velocity: .nan
+        max_velocity: 1.5
+        min_velocity: -1.5
         max_acceleration: .nan
         max_deceleration: .nan
         max_acceleration_reverse: .nan
