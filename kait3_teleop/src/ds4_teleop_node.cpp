@@ -292,8 +292,6 @@ namespace kait3_teleop {
         twist_message.angular.z = angular_z;
 
         if (stamped_) {
-            assert(twist_stamped_publisher_ != nullptr);
-            
             TwistStampedMessage twist_stamped_message;
             twist_stamped_message.header.stamp = this->now();
             twist_stamped_message.header.frame_id = base_frame_id_;
@@ -301,8 +299,6 @@ namespace kait3_teleop {
         
             twist_stamped_publisher_->publish(twist_stamped_message);
         } else {
-            assert(twist_publisher_ != nullptr);
-
             twist_publisher_->publish(twist_message);
         }
     }
