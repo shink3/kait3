@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", RUN+="/bin/sh -c 'echo 1 > /sys/bus/usb-serial/devices/$kernel/latency_timer'"

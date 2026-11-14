@@ -1,0 +1,10 @@
+<library path="kait3_roboclaw_hardware">
+  <class name="kait3_roboclaw_hardware/RoboClawHardware"
+         type="kait3_roboclaw_hardware::RoboClawHardware"
+         base_class_type="hardware_interface::SystemInterface">
+
+    <description>
+      RoboClaw hardware interface for KAIT3 robot.
+    </description>
+  </class>
+</library>
