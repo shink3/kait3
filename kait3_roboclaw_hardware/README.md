@@ -64,7 +64,7 @@ The following example shows how to configure the hardware interface in a URDF/Xa
 ```xml
 <ros2_control name="RoboClawHardware" type="system">
   <hardware>
-    <plugin>kait3_hardware/RoboClawHardware</plugin>
+    <plugin>kait3_roboclaw_hardware/RoboClawHardware</plugin>
 
     <!-- Serial communication -->
     <param name="device_path">/dev/ttyUSB0</param>
