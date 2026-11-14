@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find-pkg-share kait3_bringup)/launch/robot_description.launch.py"/> 
+    <include file="$(find-pkg-share kait3_bringup)/launch/ros2_control.launch.py"/>
+    <include file="$(find-pkg-share kait3_bringup)/launch/micro_ros.launch.py"/>
+    <include file="$(find-pkg-share kait3_bringup)/launch/sensors.launch.py"/>
+</launch>
+    
