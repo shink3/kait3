@@ -141,7 +141,7 @@ The following JSON file defines the network settings, ROS 2 topics, frame IDs, a
       "lidar_topic_name": "/livox/rear/pointcloud",
       "imu_topic_name": "/livox/rear/imu",
       "lidar_frame_id": "rear_lidar_link",
-      "imu_frame_id": "rear_imu_link"
+      "imu_frame_id": "rear_imu_link",
       "extrinsic_parameter": {
         "roll": 0.0,
         "pitch": 0.0,
