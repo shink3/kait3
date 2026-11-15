@@ -20,10 +20,10 @@ namespace kait3_teleop {
             NONE    = 0x00,
             RUMBLE  = 0x01,
             COLOR   = 0x02,
-            FLUSH   = 0x04,
+            FLASH   = 0x04,
             UNKNOWN = 0x08,
-            LED     = 0x06, // COLOR  | FLUSH 
-            ALL     = 0x07, // RUMBLE | COLOR | FLUSH
+            LED     = 0x06, // COLOR  | FLASH 
+            ALL     = 0x07, // RUMBLE | COLOR | FLASH
         };
 
     public:
@@ -45,9 +45,9 @@ namespace kait3_teleop {
 
         void set_rumble(std::uint8_t weak, std::uint8_t strong);
 
-        void set_flush(float led_bright_sec, float led_dark_sec);
+        void set_flash(float led_bright_duration, float led_dark_duration);
 
-        void set_flush(std::uint8_t led_bright, std::uint8_t led_dark);
+        void set_flash(std::uint8_t led_bright, std::uint8_t led_dark);
 
     private:
         void send_output_report(
@@ -57,8 +57,8 @@ namespace kait3_teleop {
             std::uint8_t blue, 
             std::uint8_t rumble_weak, 
             std::uint8_t rumble_strong,
-            std::uint8_t flush_led_bright,
-            std::uint8_t flush_led_dark
+            std::uint8_t flash_led_bright,
+            std::uint8_t flash_led_dark
         ); 
 
     private:

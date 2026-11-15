@@ -9,7 +9,7 @@ def generate_launch_description() -> LaunchDescription:
     params_file_path = PathJoinSubstitution([
         FindPackageShare("kait3_teleop"),
         "params",
-        "teleop_parameters.yaml"
+        "teleop_params.yaml"
     ])
 
     deadzone_arg = DeclareLaunchArgument(

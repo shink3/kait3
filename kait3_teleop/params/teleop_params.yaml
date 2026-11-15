@@ -1,0 +1,29 @@
+ds4_teleop_node:
+  ros__parameters:
+    stamped: true
+    base_frame_id: "base_footprint"
+
+    slow_button: -1   # unused
+    normal_button: 9
+    turbo_button: 10
+    axes_linear: 1
+    axes_angular: 2
+
+    scale_linear_slow: 0.0
+    scale_angular_slow: 0.0
+    scale_linear: 0.4
+    scale_angular: 1.0
+    scale_linear_turbo: 0.7
+    scale_angular_turbo: 2.0
+
+    feedback:
+      enabled: true
+      device_path: "/dev/dualshock4"
+      rumble_weak_multiplier: 1.0
+      rumble_strong_multiplier: 1.0
+      flash_bright_duration: 0.5
+      flash_dark_duration: 0.5
+
+    button_events:
+      enabled: false
+      #event_names: []

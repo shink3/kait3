@@ -15,7 +15,6 @@
   <depend>sensor_msgs</depend>
   <depend>zlib</depend>
 
-  <exec_depend>teleop_twist_keyboard</exec_depend>
   <exec_depend>joy</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>

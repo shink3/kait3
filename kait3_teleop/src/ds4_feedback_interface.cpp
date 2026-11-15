@@ -33,7 +33,7 @@ namespace kait3_teleop {
         try {
             set_rumble(0.0f, 0.0f);
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            set_flush(0.0f, 0.0f);
+            set_flash(0.0f, 0.0f);
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             set_lightbar_color(0.0f, 0.0f, 1.0f);
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -85,14 +85,14 @@ namespace kait3_teleop {
         ); 
     }
 
-    void DualShock4FeedbackInterface::set_flush(float led_bright_sec, float led_dark_sec) {
-        set_flush(
-            static_cast<std::uint8_t>(std::lround(led_bright_sec * 100.0f)),
-            static_cast<std::uint8_t>(std::lround(led_dark_sec * 100.0f))
+    void DualShock4FeedbackInterface::set_flash(float led_bright_duration, float led_dark_duration) {
+        set_flash(
+            static_cast<std::uint8_t>(std::lround(led_bright_duration * 100.0f)),
+            static_cast<std::uint8_t>(std::lround(led_dark_duration * 100.0f))
         );
     }
 
-    void DualShock4FeedbackInterface::set_flush(std::uint8_t led_bright, std::uint8_t led_dark) {
+    void DualShock4FeedbackInterface::set_flash(std::uint8_t led_bright, std::uint8_t led_dark) {
         send_output_report(FeedbackFlags::LED, red_, green_, blue_, 0, 0, led_bright, led_dark);
     }
 
@@ -107,8 +107,8 @@ namespace kait3_teleop {
             std::uint8_t blue, 
             std::uint8_t rumble_weak, 
             std::uint8_t rumble_strong,
-            std::uint8_t flush_led_bright,
-            std::uint8_t flush_led_dark
+            std::uint8_t flash_led_bright,
+            std::uint8_t flash_led_dark
         ) {
     	if (!is_open()) 
    		    throw std::logic_error("device is not open");
@@ -123,8 +123,8 @@ namespace kait3_teleop {
         packet_buffer_[8]  = red;          
         packet_buffer_[9]  = green;        
         packet_buffer_[10] = blue;
-        packet_buffer_[11] = flush_led_bright;
-        packet_buffer_[12] = flush_led_dark;
+        packet_buffer_[11] = flash_led_bright;
+        packet_buffer_[12] = flash_led_dark;
         
         std::uint32_t crc = calculate_crc32(packet_buffer_.data(), packet_buffer_.size() - sizeof(uint32_t));
 
