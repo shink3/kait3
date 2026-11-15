@@ -1,41 +1,41 @@
 # Livox ROS Driver 2
 
-Livox ROS Driver 2 is the 2nd-generation driver package used to connect LiDAR products produced by Livox.
+Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世代ドライバパッケージです。
 
-This package is based on the original Livox ROS Driver 2 and has been modified for use with kait3.
+本パッケージはオリジナルの Livox ROS Driver 2 をベースに、kait3 で使用するために改変を加えたものです。
 
-## Modifications
+## 主な変更点（Modifications）
 
-The main modifications are:
+オリジナル版からの主な変更点は以下の通りです。
 
-* Made `lidar_frame_id` configurable through the JSON configuration file.
-* Made `imu_frame_id` configurable through the JSON configuration file.
-* Made `lidar_topic_name` configurable through the JSON configuration file.
-* Made `imu_topic_name` configurable through the JSON configuration file.
-* Added `kait3_MID360s_config.json` for driver configuration.
-* Added `kait3_MID360s.launch.py` for launching the driver.
+- **JSON設定ファイルから `lidar_frame_id` を設定可能にしました。**
+- **JSON設定ファイルから `imu_frame_id` を設定可能にしました。**
+- **JSON設定ファイルから `lidar_topic_name` を設定可能にしました。**
+- **JSON設定ファイルから `imu_topic_name` を設定可能にしました。**
+- **ドライバ設定用の `kait3_MID360s_config.json` を追加しました。**
+- **ドライバ起動用の `kait3_MID360s.launch.py` を追加しました。**
 
-## Prerequisites
+## 前提条件（Prerequisites）
 
-This package is based on the original Livox ROS Driver 2.
+本パッケージはオリジナルの Livox ROS Driver 2 をベースにしています。
 
-For the original driver, see the [original README](https://github.com/Livox-SDK/livox_ros_driver2/blob/master/README.md).
+オリジナル版のドライバについては、[オリジナルのREADME](https://github.com/Livox-SDK/livox_ros_driver2/blob/master/README.md)を参照してください。
 
-The modified version is currently developed and tested with:
+本改変版は現在、以下の環境で開発および動作確認を行っています。
 
 * Ubuntu 24.04 LTS
 * ROS 2 Jazzy
 * Livox Mid-360S
 
-## Build and Run
+## ビルドと実行（Build and Run）
 
-For the general build and run procedure, see the [Build & Run Livox ROS Driver 2](https://github.com/Livox-SDK/livox_ros_driver2#2-build--run-livox-ros-driver-2) section of the original README.
+一般的なビルドおよび実行手順については、オリジナルREADMEの [Build & Run Livox ROS Driver 2](https://github.com/Livox-SDK/livox_ros_driver2#2-build--run-livox-ros-driver-2) セクションを参照してください。
 
-### Build
+### ビルド
 
-The package can be built using either `colcon` or the provided `build.sh` script.
+本パッケージは `colcon` または付属の `build.sh` スクリプトを使用してビルドできます。
 
-#### Using colcon
+#### colcon を使用する場合
 
 ```bash
 cd ~/ros2_ws
@@ -43,7 +43,7 @@ cd ~/ros2_ws
 colcon build --symlink-install --packages-select livox_ros_driver2
 ```
 
-#### Using build.sh
+#### build.sh を使用する場合
 
 ```bash
 cd ~/ros2_ws/src/livox_ros_driver2
@@ -51,87 +51,87 @@ cd ~/ros2_ws/src/livox_ros_driver2
 ./build.sh jazzy
 ```
 
-### Run
+### 実行
 
-Launch the Livox ROS Driver 2 for kait3:
-
-```bash
-ros2 launch livox_ros_driver2 kait3_MID360s.launch.py
-```
-
-The launch file provides the following launch arguments:
-
-| Argument           | Default value                           | Description                                                                                     |
-| ------------------ | --------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `xfer_format`      | `0`                                     | Point cloud output format. `0`: PointCloud2 (`PointXYZRTL`), `1`: customized point cloud format |
-| `multi_topic`      | `1`                                     | Topic configuration. `0`: all LiDARs share the same topic, `1`: one topic per LiDAR             |
-| `publish_freq`     | `10.0`                                  | Point cloud publish frequency in Hz                                                             |
-| `config_file`      | `config/kait3_MID360s_config.json`      | Path to the Livox configuration JSON file relative to the package share directory               |
-| `rviz`             | `false`                                 | Whether to launch RViz2                                                                         |
-| `rviz_config_file` | `config/kait3_display_point_cloud.rviz` | Path to the RViz configuration file relative to the package share directory                     |
-
-For example, to launch RViz2:
+kait3 用の Livox ROS Driver 2 を起動します。
 
 ```bash
-ros2 launch livox_ros_driver2 kait3_MID360s.launch.py rviz:=true
+ros2 launch livox_ros_driver2 MID360s.launch.py
 ```
 
-To change the publish frequency:
+このlaunchファイルでは、以下の起動引数（launch arguments）を指定できます。
+
+| 引数 | デフォルト値 | 説明 |
+| :--- | :--- | :--- |
+| `xfer_format` | `0` | 点群の出力フォーマット。`0`: PointCloud2 (`PointXYZRTL`)、`1`: カスタム点群フォーマット |
+| `multi_topic` | `1` | トピック構成。`0`: 全LiDARで同じトピックを共有、`1`: LiDARごとに個別のトピックを使用 |
+| `publish_freq` | `10.0` | 点群の配信周波数（Hz） |
+| `config_file` | `config/multi_MID360s_config.json` | パッケージの share ディレクトリからの相対パスによるLivox設定JSONファイルのパス |
+| `rviz` | `false` | RViz2 を同時に起動するかどうか |
+| `rviz_config_file` | `config/display_point_cloud.rviz` | パッケージの share ディレクトリからの相対パスによるRViz設定ファイルのパス |
+
+例：RViz2 を同時に起動する場合
 
 ```bash
-ros2 launch livox_ros_driver2 kait3_MID360s.launch.py publish_freq:=20.0
+ros2 launch livox_ros_driver2 MID360s.launch.py rviz:=true
 ```
 
-To display all available launch arguments:
+配信周波数を変更する場合
 
 ```bash
-ros2 launch livox_ros_driver2 kait3_MID360s.launch.py --show-args
+ros2 launch livox_ros_driver2 MID360s.launch.py publish_freq:=20.0
 ```
 
-## LiDAR config
+利用可能なすべての起動引数を表示する場合
 
-The following JSON file defines the network settings, ROS 2 topics, frame IDs, and extrinsic parameters for the LiDAR devices.
+```bash
+ros2 launch livox_ros_driver2 MID360s.launch.py --show-args
+```
+
+## LiDAR 設定（LiDAR config）
+
+以下のJSONファイルでは、LiDARデバイスのネットワーク設定、ROS 2トピック、フレームID、および外部パラメータ（extrinsic parameters）を定義します。
 
 ```jsonc
 {
   "lidar_summary_info": {
-    "lidar_type": 8                                 // LiDAR type
+    "lidar_type": 8                                 // LiDARのタイプ
   },
   "Mid360s": {
     "lidar_net_info": {
-      "cmd_data_port": 56100,                       // LiDAR command port
-      "push_msg_port": 56200,                       // LiDAR message port
-      "point_data_port": 56300,                     // LiDAR point cloud data port
-      "imu_data_port": 56400,                       // LiDAR IMU data port
-      "log_data_port": 56500                        // LiDAR log data port
+      "cmd_data_port": 56100,                       // LiDAR コマンドポート
+      "push_msg_port": 56200,                       // LiDAR メッセージポート
+      "point_data_port": 56300,                     // LiDAR 点群データポート
+      "imu_data_port": 56400,                       // LiDAR IMUデータポート
+      "log_data_port": 56500                        // LiDAR ログデータポート
     },
     "host_net_info": [
       {
-        "host_ip": "192.168.1.xxx",                 // Host PC IP address
-        "cmd_data_port": 56101,                     // Host command port
-        "push_msg_port": 56201,                     // Host message port
-        "point_data_port": 56301,                   // Host point cloud data port
-        "imu_data_port": 56401,                     // Host IMU data port
-        "log_data_port": 56501                      // Host log data port
+        "host_ip": "192.168.1.xxx",                 // ホストPCのIPアドレス
+        "cmd_data_port": 56101,                     // ホスト コマンドポート
+        "push_msg_port": 56201,                     // ホスト メッセージポート
+        "point_data_port": 56301,                   // ホスト 点群データポート
+        "imu_data_port": 56401,                     // ホスト IMUデータポート
+        "log_data_port": 56501                      // ホスト ログデータポート
       }
     ]
   },
   "lidar_configs": [
     {
-      "ip": "192.168.1.1xx",                         // LiDAR IP address
-      "pcl_data_type": 1,                            // Point cloud data type
-      "pattern_mode": 0,                             // Scan pattern mode
-      "lidar_topic_name": "/livox/front/pointcloud", // LiDAR point cloud topic
-      "imu_topic_name": "/livox/front/imu",          // IMU topic
-      "lidar_frame_id": "front_lidar_link",          // TF frame ID
-      "imu_frame_id": "front_imu_link",              // TF frame ID
-      "extrinsic_parameter": {            
-        "roll": 0.0,                                 // Rotation around X-axis
-        "pitch": 0.0,                                // Rotation around Y-axis
-        "yaw": 0.0,                                  // Rotation around Z-axis
-        "x": 0,                                      // Translation along X-axis
-        "y": 0,                                      // Translation along Y-axis
-        "z": 0                                       // Translation along Z-axis
+      "ip": "192.168.1.1xx",                         // LiDARのIPアドレス
+      "pcl_data_type": 1,                            // 点群データタイプ
+      "pattern_mode": 0,                             // スキャンパターンモード
+      "lidar_topic_name": "/livox/front/pointcloud", // LiDAR点群トピック名
+      "imu_topic_name": "/livox/front/imu",          // IMUトピック名
+      "lidar_frame_id": "front_lidar_link",          // LiDARのTFフレームID
+      "imu_frame_id": "front_imu_link",              // IMUのTFフレームID
+      "extrinsic_parameter": {
+        "roll": 0.0,                                 // X軸周りの回転
+        "pitch": 0.0,                                // Y軸周りの回転
+        "yaw": 0.0,                                  // Z軸周りの回転
+        "x": 0,                                      // X軸方向の並進
+        "y": 0,                                      // Y軸方向の並進
+        "z": 0                                       // Z軸方向の並進
       }
     },
     {
@@ -154,3 +154,4 @@ The following JSON file defines the network settings, ROS 2 topics, frame IDs, a
   ]
 }
 ```
+
