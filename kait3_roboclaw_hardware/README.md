@@ -12,7 +12,7 @@ Basicmicro RoboClaw V5 モータードライバを使用して、対向二輪（
 ## udev ルールの設定
 
 RoboClaw を USB シリアル経由で PC に直接接続する場合、OS のデフォルト設定では USB のレイテンシタイマー（latency timer）が働き、シリアル通信に遅延が発生します。
-通信の遅延を防ぎためにudev ルールを適用することを推奨します。
+通信の遅延を防ぐためにudev ルールを適用することを推奨します。
 
 ```bash
 sudo cp udev/99-roboclaw.rules /etc/udev/rules.d/
