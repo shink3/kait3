@@ -4,7 +4,7 @@ Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世�
 
 本パッケージはオリジナルの Livox ROS Driver 2 をベースに、kait3 で使用するために改変を加えたものです。
 
-## 1. 主な変更点
+## 主な変更点
 
 オリジナル版からの主な変更点は以下の通りです。
 
@@ -15,7 +15,7 @@ Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世�
 - **ドライバ設定用の `multi_MID360s_config.json` を追加しました。**
 - **ドライバ起動用の `MID360s.launch.py` を追加しました。**
 
-## 2. 前提条件
+## 動作要件
 
 本パッケージはオリジナルの Livox ROS Driver 2 をベースにしています。
 
@@ -27,11 +27,11 @@ Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世�
 - **ROS 2 Jazzy**
 - **Livox Mid-360S**
 
-## 3. ビルドと実行
+## ビルドと実行
 
 一般的なビルドおよび実行手順については、オリジナルREADMEの [Build & Run Livox ROS Driver 2](https://github.com/Livox-SDK/livox_ros_driver2#2-build--run-livox-ros-driver-2) セクションを参照してください。
 
-### 3.1 ビルド
+### ビルド
 
 本パッケージは `colcon` または付属の `build.sh` スクリプトを使用してビルドできます。
 
@@ -51,7 +51,7 @@ cd ~/ros2_ws/src/livox_ros_driver2
 ./build.sh jazzy
 ```
 
-### 3.2 実行
+### 実行
 
 kait3 用の Livox ROS Driver 2 を起動します。
 

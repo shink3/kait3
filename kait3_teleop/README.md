@@ -16,13 +16,19 @@ Bluetooth 接続された PlayStation 4 用コントローラー DualShock 4 を
 - **実行中の速度倍率調整**
   `ros2 param set` コマンドを使用して、ノードの再起動なしに速度倍率を変更できます。
 
-## 1. 事前準備
+## 動作要件
 
-### 1.1. DualShock 4 の接続
+- **Ubuntu 24.04 LTS**
+- **ROS2 jazzy**
+- **DualShock4とのBluetooth接続**
+
+## 事前準備
+
+### DualShock 4 の接続
 
 DualShock 4 を Bluetooth で PC に接続してください。
 
-### 1.2. udev ルールの設定（推奨）
+### udev ルールの設定（推奨）
 
 振動やライトバーの制御機能を使用する場合、DualShock 4 の `hidraw` デバイスへの書き込み権限が必要です。
 
@@ -47,7 +53,7 @@ ls -l /dev/dualshock4
 
 振動・ライトバー制御を使用しない場合、この設定は不要です。その場合は `feedback.enabled` を `false` にしてください。
 
-## 2. 起動方法
+## 起動方法
 
 ```bash
 ros2 launch kait3_teleop teleop_joy.launch.py
@@ -115,7 +121,7 @@ ros2 topic pub --once \
   std_msgs/msg/Bool "{data: false}"
 ```
 
-## 3. トピック一覧
+## トピック一覧
 
 ### Subscribed Topics（入力）
 
@@ -139,11 +145,11 @@ ros2 topic pub --once \
 
 トピック名は ROS 2 の名前解決規則に従います。上記はノードの名前空間が `/` の場合の例です。
 
-## 4. パラメータ一覧
+## パラメータ一覧
 
 設定ファイルは `params/teleop_params.yaml` です。
 
-### 4.1. 基本設定・速度制御
+### 基本設定・速度制御
 
 | パラメータ名 | 型 | デフォルト値 | 動的変更 | 説明 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -161,7 +167,7 @@ ros2 topic pub --once \
 | `scale_linear_turbo` | `double` | `0.7` | 可 | 高速モード時の並進速度倍率（`>= 0.0`） |
 | `scale_angular_turbo` | `double` | `2.0` | 可 | 高速モード時の角速度倍率（`>= 0.0`） |
 
-### 4.2. フィードバック設定（`feedback`）
+### フィードバック設定（`feedback`）
 
 | パラメータ名 | 型 | デフォルト値 | 説明 |
 | :--- | :--- | :--- | :--- |
@@ -172,7 +178,7 @@ ros2 topic pub --once \
 | `feedback.flash_bright_duration` | `double` | `0.5` | 点滅時の点灯時間（秒、`0.0` ～ `2.55`） |
 | `feedback.flash_dark_duration` | `double` | `0.5` | 点滅時の消灯時間（秒、`0.0` ～ `2.55`） |
 
-### 4.3. ボタンイベント設定（`button_events`）
+### ボタンイベント設定（`button_events`）
 
 | パラメータ名 | 型 | デフォルト値 | 説明 |
 | :--- | :--- | :--- | :--- |
@@ -182,7 +188,7 @@ ros2 topic pub --once \
 
 イベント名ごとにボタン番号を設定します。ボタンが押された瞬間に対応するイベントトピックへ `std_msgs/msg/Empty` が1回配信されます。
 
-## 5. 設定例
+## 設定例
 
 以下は `params/teleop_params.yaml` の設定例です。
 
@@ -238,7 +244,7 @@ ds4_teleop_node:
         button: 6
 ```
 
-## 6. DualShock 4 のボタン・軸番号
+## DualShock 4 のボタン・軸番号
 
 `joy_node` が配信する `sensor_msgs/msg/Joy` の配列インデックスを使用します。
 
@@ -276,7 +282,7 @@ ds4_teleop_node:
 
 ※ ボタン・軸番号は `joy_node` の設定によって異なる場合があります。実際の入力値は `ros2 topic echo /joy` で確認してください。
 
-## 7. 注意事項
+## 注意事項
 - `slow_button` などの速度モード用ボタンに負数を指定すると、そのモードのイネーブルボタンは無効になります。
 - 速度倍率は `0.0` 以上の値を指定してください。
 - ボタン番号・軸番号は、使用するコントローラーと `joy_node` の設定に合わせてください。
