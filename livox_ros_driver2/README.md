@@ -1,4 +1,4 @@
-# Livox ROS Driver 2
+# livox_ros_driver2
 
 Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世代ドライバパッケージです。
 
