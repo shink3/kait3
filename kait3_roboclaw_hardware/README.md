@@ -4,6 +4,13 @@ Basicmicro RoboClaw V5 モータードライバを使用して、対向二輪（
 
 本パッケージは **ROS 2 Jazzy** で動作確認を行っています。
 
+## 動作要件
+
+- **Ubuntu 24.04 LTS**
+- **ROS 2 Jazzy**
+- **Basicmicro RoboClaw V5**
+- **RoboClaw との適切なシリアル通信接続**
+
 ## udev ルールの設定
 
 RoboClaw を USB シリアル経由で PC に直接接続する場合、OS のデフォルト設定では USB のレイテンシタイマー（latency timer）が働き、シリアル通信に遅延が発生します。
@@ -17,12 +24,6 @@ sudo udevadm trigger
 
 ※ ルール適用後、RoboClaw の USB ケーブルを一度抜き差しして設定を反映させてください。
 
-## 動作要件
-
-- **Ubuntu 24.04 LTS**
-- **ROS 2 Jazzy**
-- **Basicmicro RoboClaw V5**
-- **RoboClaw との適切なシリアル通信接続**
 
 ## ハードウェアパラメータ
 
