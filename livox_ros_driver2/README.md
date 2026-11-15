@@ -4,7 +4,7 @@ Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世�
 
 本パッケージはオリジナルの Livox ROS Driver 2 をベースに、kait3 で使用するために改変を加えたものです。
 
-## 主な変更点（Modifications）
+## 1. 主な変更点
 
 オリジナル版からの主な変更点は以下の通りです。
 
@@ -12,10 +12,10 @@ Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世�
 - **JSON設定ファイルから `imu_frame_id` を設定可能にしました。**
 - **JSON設定ファイルから `lidar_topic_name` を設定可能にしました。**
 - **JSON設定ファイルから `imu_topic_name` を設定可能にしました。**
-- **ドライバ設定用の `kait3_MID360s_config.json` を追加しました。**
-- **ドライバ起動用の `kait3_MID360s.launch.py` を追加しました。**
+- **ドライバ設定用の `multi_MID360s_config.json` を追加しました。**
+- **ドライバ起動用の `MID360s.launch.py` を追加しました。**
 
-## 前提条件（Prerequisites）
+## 2. 前提条件
 
 本パッケージはオリジナルの Livox ROS Driver 2 をベースにしています。
 
@@ -23,15 +23,15 @@ Livox ROS Driver 2 は、Livox製のLiDAR製品を接続するための第2世�
 
 本改変版は現在、以下の環境で開発および動作確認を行っています。
 
-* Ubuntu 24.04 LTS
-* ROS 2 Jazzy
-* Livox Mid-360S
+- **Ubuntu 24.04 LTS**
+- **ROS 2 Jazzy**
+- **Livox Mid-360S**
 
-## ビルドと実行（Build and Run）
+## 3. ビルドと実行
 
 一般的なビルドおよび実行手順については、オリジナルREADMEの [Build & Run Livox ROS Driver 2](https://github.com/Livox-SDK/livox_ros_driver2#2-build--run-livox-ros-driver-2) セクションを参照してください。
 
-### ビルド
+### 3.1 ビルド
 
 本パッケージは `colcon` または付属の `build.sh` スクリプトを使用してビルドできます。
 
@@ -51,7 +51,7 @@ cd ~/ros2_ws/src/livox_ros_driver2
 ./build.sh jazzy
 ```
 
-### 実行
+### 3.2 実行
 
 kait3 用の Livox ROS Driver 2 を起動します。
 
@@ -88,7 +88,7 @@ ros2 launch livox_ros_driver2 MID360s.launch.py publish_freq:=20.0
 ros2 launch livox_ros_driver2 MID360s.launch.py --show-args
 ```
 
-## LiDAR 設定（LiDAR config）
+## 4. LiDAR 設定（LiDAR config）
 
 以下のJSONファイルでは、LiDARデバイスのネットワーク設定、ROS 2トピック、フレームID、および外部パラメータ（extrinsic parameters）を定義します。
 
