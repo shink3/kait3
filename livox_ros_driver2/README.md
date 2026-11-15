@@ -95,43 +95,43 @@ ros2 launch livox_ros_driver2 MID360s.launch.py --show-args
 ```jsonc
 {
   "lidar_summary_info": {
-    "lidar_type": 8                                 // LiDARのタイプ
+    "lidar_type": 8                                 
   },
   "Mid360s": {
     "lidar_net_info": {
-      "cmd_data_port": 56100,                       // LiDAR コマンドポート
-      "push_msg_port": 56200,                       // LiDAR メッセージポート
-      "point_data_port": 56300,                     // LiDAR 点群データポート
-      "imu_data_port": 56400,                       // LiDAR IMUデータポート
-      "log_data_port": 56500                        // LiDAR ログデータポート
+      "cmd_data_port": 56100,                       
+      "push_msg_port": 56200,                       
+      "point_data_port": 56300,                     
+      "imu_data_port": 56400,                       
+      "log_data_port": 56500                        
     },
     "host_net_info": [
       {
-        "host_ip": "192.168.1.xxx",                 // ホストPCのIPアドレス
-        "cmd_data_port": 56101,                     // ホスト コマンドポート
-        "push_msg_port": 56201,                     // ホスト メッセージポート
-        "point_data_port": 56301,                   // ホスト 点群データポート
-        "imu_data_port": 56401,                     // ホスト IMUデータポート
-        "log_data_port": 56501                      // ホスト ログデータポート
+        "host_ip": "192.168.1.xxx",                 
+        "cmd_data_port": 56101,                     
+        "push_msg_port": 56201,                     
+        "point_data_port": 56301,               
+        "imu_data_port": 56401,                     
+        "log_data_port": 56501                      
       }
     ]
   },
   "lidar_configs": [
     {
-      "ip": "192.168.1.1xx",                         // LiDARのIPアドレス
-      "pcl_data_type": 1,                            // 点群データタイプ
-      "pattern_mode": 0,                             // スキャンパターンモード
-      "lidar_topic_name": "/livox/front/pointcloud", // LiDAR点群トピック名
-      "imu_topic_name": "/livox/front/imu",          // IMUトピック名
-      "lidar_frame_id": "front_lidar_link",          // LiDARのTFフレームID
-      "imu_frame_id": "front_imu_link",              // IMUのTFフレームID
+      "ip": "192.168.1.1xx",                        
+      "pcl_data_type": 1,                           
+      "pattern_mode": 0,                             
+      "lidar_topic_name": "livox/front/pointcloud", 
+      "imu_topic_name": "livox/front/imu",          
+      "lidar_frame_id": "front_lidar_link",          
+      "imu_frame_id": "front_imu_link",         
       "extrinsic_parameter": {
-        "roll": 0.0,                                 // X軸周りの回転
-        "pitch": 0.0,                                // Y軸周りの回転
-        "yaw": 0.0,                                  // Z軸周りの回転
-        "x": 0,                                      // X軸方向の並進
-        "y": 0,                                      // Y軸方向の並進
-        "z": 0                                       // Z軸方向の並進
+        "roll": 0.0,                            
+        "pitch": 0.0,                                
+        "yaw": 0.0,                                  
+        "x": 0,                                      
+        "y": 0,                                      
+        "z": 0                                      
       }
     },
     {
