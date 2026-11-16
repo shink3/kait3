@@ -15,25 +15,26 @@
 
 namespace kait3_roboclaw_hardware {
 
-    struct VelocityPidSettings {
-        double kp;
-        double ki;
-        double kd;
-        std::uint32_t qpps;
-    };
-
-    struct DriveSpecifications {
-        double counts_per_rad;
-        std::string motion_strategy;
-        std::uint32_t default_acceleration;
-        std::optional<double> watchdog_timeout_sec;
-        std::optional<double> m1_max_current;
-        std::optional<double> m2_max_current;
-        std::optional<VelocityPidSettings> m1_pid_settings;
-        std::optional<VelocityPidSettings> m2_pid_settings;
-    };
-
     class RoboClawHardware : public hardware_interface::SystemInterface {
+    private:
+    	struct VelocityPidSettings {
+		    double kp;
+		    double ki;
+		    double kd;
+		    std::uint32_t qpps;
+		};
+
+		struct DriveSpecifications {
+		    double counts_per_rad;
+		    std::string motion_strategy;
+		    std::uint32_t default_acceleration;
+		    std::optional<double> watchdog_timeout_sec;
+		    std::optional<double> m1_max_current;
+		    std::optional<double> m2_max_current;
+		    std::optional<VelocityPidSettings> m1_pid_settings;
+		    std::optional<VelocityPidSettings> m2_pid_settings;
+		};
+
     private:
 
         template<typename T>
