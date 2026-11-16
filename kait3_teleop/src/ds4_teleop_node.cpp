@@ -345,7 +345,7 @@ namespace kait3_teleop {
     void DualShock4TeleopNode::validate_event_name(const std::string& event_name) {
         if (event_name.empty()) {
             throw std::invalid_argument(
-                "event name in parameter `button_events.event_names` cannot be empty"
+                "event name in parameter `button_events.event_names` must not be empty"
             );
         }
         
