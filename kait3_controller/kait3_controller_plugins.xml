@@ -1,0 +1,10 @@
+<library path="emergency_stop_controller">
+  <class name="kait3_controller/EmergencyStopController"
+         type="kait3_controller::EmergencyStopController"
+         base_class_type="controller_interface::ControllerInterface"/>
+
+  <description>
+      Emergency stop controller.
+  </description>
+
+</library>
