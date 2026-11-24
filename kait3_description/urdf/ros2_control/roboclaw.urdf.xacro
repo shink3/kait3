@@ -13,13 +13,14 @@
         <param name="write_timeout_ms">1000</param>
         <param name="exclusive_access">false</param>
         <param name="unacknowledged">false</param>
-        <param name="max_attempts">1</param>
-
+        <param name="max_attempts">3</param>
+        
         <param name="wheel_radius">${wheel_radius}</param>
         <param name="counts_per_revolution">2000</param>
         <param name="gear_ratio">22.75</param>
         <param name="motion_strategy">speed_accel</param>
         <param name="default_acceleration">15700</param>
+            
       </hardware>
 
       <joint name="left_wheel_joint">
@@ -33,6 +34,10 @@
         <state_interface name="position"/>
 	    <state_interface name="velocity"/>
       </joint>
+
+      <gpio name="emergency_stop">
+        <command_interface name="active"/>
+      </gpio>
     </ros2_control>
   </xacro:macro>
 </robot>

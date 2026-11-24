@@ -30,6 +30,11 @@
           <param name="initial_value">0.0</param>
         </state_interface>
       </joint>
+
+      <gpio name="emergency_stop">
+        <command_interface name="active"/>
+      </gpio>
+
     </ros2_control>
   </xacro:macro>
 </robot>
