@@ -1,4 +1,5 @@
 from launch import LaunchDescription
+from launch.descriptions import executable
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -14,7 +15,14 @@ def generate_launch_description() -> LaunchDescription:
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[controllers_file],
-        output="both"
+        output="screen"
+    )
+
+    emergency_stop_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["emergency_stop_controller"],
+        output="screen"
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -33,6 +41,7 @@ def generate_launch_description() -> LaunchDescription:
 
     return LaunchDescription([
         control_node,
+        emergency_stop_controller_spawner,
         joint_state_broadcaster_spawner,
         diff_drive_controller_spawner
     ]) 

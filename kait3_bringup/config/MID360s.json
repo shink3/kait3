@@ -26,8 +26,8 @@
       "ip" : "192.168.1.143",
       "pcl_data_type" : 1,
       "pattern_mode" : 0,
-      "lidar_topic_name": "/livox/front/pointcloud",
-      "imu_topic_name": "/livox/front/imu",
+      "lidar_topic_name": "livox/front/pointcloud",
+      "imu_topic_name": "livox/front/imu",
       "lidar_frame_id": "front_lidar_link",
       "imu_frame_id": "front_imu_link",
       "extrinsic_parameter" : {
@@ -44,7 +44,7 @@
       "pcl_data_type" : 1,
       "pattern_mode" : 0,
       "lidar_topic_name": "livox/rear/pointcloud",
-      "imu_topic_name": "/livox/rear/imu",
+      "imu_topic_name": "livox/rear/imu",
       "lidar_frame_id": "rear_livox_link",
       "imu_frame_id": "rear_imu_link",
       "extrinsic_parameter" : {
