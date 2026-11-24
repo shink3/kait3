@@ -15,6 +15,7 @@
 
 namespace kait3_roboclaw_hardware {
 
+
     class RoboClawHardware : public hardware_interface::SystemInterface {
     private:
     	struct VelocityPidSettings {
@@ -34,7 +35,7 @@ namespace kait3_roboclaw_hardware {
 		    std::optional<VelocityPidSettings> m1_pid_settings;
 		    std::optional<VelocityPidSettings> m2_pid_settings;
 		};
-
+    
     private:
 
         template<typename T>
@@ -92,6 +93,7 @@ namespace kait3_roboclaw_hardware {
         std::unique_ptr<driver::RoboClaw> roboclaw_driver_;
         std::array<std::uint32_t, 2> previous_encoder_counts_;
         std::array<double, 2> position_;
+        bool wait_for_zero_velocity_after_e_stop_;
     };
 
     template<typename T>

@@ -1,4 +1,5 @@
 #include "kait3_roboclaw_hardware/roboclaw_hardware.hpp"
+#include <hardware_interface/hardware_component_interface.hpp>
 #include <rcutils/macros.h>
 
 namespace kait3_roboclaw_hardware {
@@ -7,7 +8,8 @@ namespace kait3_roboclaw_hardware {
     : specs_(),
       roboclaw_driver_(nullptr),
       previous_encoder_counts_(),
-      position_() {}
+      position_(),
+      wait_for_zero_velocity_after_e_stop_(false) {}
     
     void RoboClawHardware::write_velocity(double left_vel, double right_vel) {
 
@@ -28,7 +30,7 @@ namespace kait3_roboclaw_hardware {
         if (hardware_interface::SystemInterface::on_init(params) != hardware_interface::CallbackReturn::SUCCESS) 
             return hardware_interface::CallbackReturn::ERROR;
 
-        auto logger = get_logger();
+        auto logger = this->get_logger();
 
         RCLCPP_INFO(logger, "Initializing hardware...");
         
@@ -37,7 +39,7 @@ namespace kait3_roboclaw_hardware {
         if (get_hardware_info().joints.size() != 2) {
             RCLCPP_FATAL(
                 logger, 
-                "Hardware info reports %zu joints, but 2 (diff drive) expected.",
+                "Hardware info reports %zu joints, but two expected",
                 get_hardware_info().joints.size()
             );
             return hardware_interface::CallbackReturn::ERROR;
@@ -47,7 +49,7 @@ namespace kait3_roboclaw_hardware {
             RCLCPP_INFO(logger, "Validating interfaces for joint '%s'", joint.name.c_str());
             
             if (joint.name != "left_wheel_joint" && joint.name != "right_wheel_joint") {
-                RCLCPP_FATAL(logger, "Joint name must be either 'left_wheel_joint' or 'right_wheel_joint'!");
+                RCLCPP_FATAL(logger, "Joint name must be either 'left_wheel_joint' or 'right_wheel_joint'");
                 return hardware_interface::CallbackReturn::ERROR;
             }
 
@@ -55,7 +57,7 @@ namespace kait3_roboclaw_hardware {
                 joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
                 RCLCPP_FATAL(
                     logger,
-                    "Joint '%s' must have exactly one '%s' command interface!",
+                    "Joint '%s' must have exactly one '%s' command interface",
                     joint.name.c_str(),
                     hardware_interface::HW_IF_VELOCITY
                 );
@@ -85,13 +87,58 @@ namespace kait3_roboclaw_hardware {
             ) {
                 RCLCPP_FATAL(
                     logger,
-                    "Joint '%s' must have exactly two state interfaces, '%s' and '%s'!",
+                    "Joint '%s' must have exactly two state interfaces, '%s' and '%s'",
                     joint.name.c_str(),
                     hardware_interface::HW_IF_POSITION,
                     hardware_interface::HW_IF_VELOCITY
                 );
                 return hardware_interface::CallbackReturn::ERROR;
             }
+        }
+        
+        const auto& gpios = get_hardware_info().gpios;
+        RCLCPP_INFO(logger, "Validating GPIOs");
+        if (gpios.size() != 1) {
+            RCLCPP_FATAL(
+                logger, 
+                "Hardware info reports %zu GPIOs, but one expected",
+                gpios.size()
+            );
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        
+        RCLCPP_INFO(logger, "Validating interface for GPIO '%s'", gpios[0].name.c_str());
+        
+        if (gpios[0].name != "emergency_stop") {
+            RCLCPP_FATAL(
+                logger, 
+                "GPIO name must be 'emergency_stop' but got '%s'",
+                gpios[0].name.c_str()
+            );
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+
+        if (gpios[0].command_interfaces.size() != 1 ||
+            gpios[0].command_interfaces[0].name != "active"
+        ) {
+            RCLCPP_FATAL(
+                logger,
+                "GPIO '%s' must have exactly one 'active' command interface",
+                gpios[0].name.c_str()
+            );
+
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+
+        if (!gpios[0].state_interfaces.empty()) {
+            RCLCPP_FATAL(
+                logger,
+                "GPIO '%s' must have no state interfaces. but got %zu",
+                gpios[0].name.c_str(),
+                gpios[0].state_interfaces.size()
+            );
+
+            return hardware_interface::CallbackReturn::ERROR;
         }
 
         std::string device_path = get_hardware_parameter_or_default<std::string>("device_path", "/dev/ttyUSB0");
@@ -127,17 +174,17 @@ namespace kait3_roboclaw_hardware {
         RCLCPP_INFO(logger, "Validating hardware parameter");
 
         if (wheel_radius <= 0.0) {
-            RCLCPP_FATAL(logger, "Parameter `wheel_radius` must be greater than zero!");
+            RCLCPP_FATAL(logger, "Parameter `wheel_radius` must be greater than zero");
             return hardware_interface::CallbackReturn::ERROR;
         }
 
         if (quad_counts_per_revolution == 0) {
-            RCLCPP_FATAL(logger, "Parameter `counts_per_revolution` cannot be zero!");
+            RCLCPP_FATAL(logger, "Parameter `counts_per_revolution` cannot be zero");
             return hardware_interface::CallbackReturn::ERROR;
         }
 
         if (gear_ratio <= 0.0) {
-            RCLCPP_FATAL(logger, "Parameter `gear_ratio` must be greater than zero!");
+            RCLCPP_FATAL(logger, "Parameter `gear_ratio` must be greater than zero");
             return hardware_interface::CallbackReturn::ERROR;
         }
 
@@ -152,7 +199,7 @@ namespace kait3_roboclaw_hardware {
 
                 RCLCPP_FATAL(
                     logger,
-                    "Parameter `watchdog_timeout_sec` must be in range of %.1fs to %.1fs! but got %f",
+                    "Parameter `watchdog_timeout_sec` must be in range of %.1fs to %.1fs, but got %f",
                     static_cast<double>(min_timeout_ms) * ms_to_s,
                     static_cast<double>(max_timeout_ms) * ms_to_s,
                     static_cast<double>(watchdog_timeout_ms.value()) * ms_to_s
@@ -173,7 +220,7 @@ namespace kait3_roboclaw_hardware {
             motion_strategy != "speed_accel") {
             RCLCPP_FATAL(
                 logger, 
-                "Parameter `motion_strategy` must be one of 'speed' or 'speed_accel'! Current: %s", 
+                "Parameter `motion_strategy` must be one of 'speed' or 'speed_accel', but got %s", 
                 motion_strategy.c_str()
             );
             return hardware_interface::CallbackReturn::ERROR;
@@ -185,7 +232,7 @@ namespace kait3_roboclaw_hardware {
             if (m1_max_current.value() < motor_min_current_a || motor_max_current_a < m1_max_current.value()) {
                 RCLCPP_FATAL(
                     logger, 
-                    "Parameter `m1_max_current` must be in the range of %.1fA to %.1fA!, but got %f",
+                    "Parameter `m1_max_current` must be in the range of %.1fA to %.1fA, but got %f",
                     motor_min_current_a,
                     motor_max_current_a,
                     m1_max_current.value()
@@ -198,7 +245,7 @@ namespace kait3_roboclaw_hardware {
             if (m2_max_current.value() < motor_min_current_a || motor_max_current_a < m2_max_current.value()) {
                 RCLCPP_FATAL(
                     logger,
-                    "Parameter `m2_max_current` must be in range of %fA to %fA!, but got %f",
+                    "Parameter `m2_max_current` must be in range of %fA to %fA, but got %f",
                     motor_min_current_a,
                     motor_max_current_a,
                     m2_max_current.value()
@@ -210,12 +257,12 @@ namespace kait3_roboclaw_hardware {
         std::optional<VelocityPidSettings> m1_pid_settings = std::nullopt;
         if (m1_kp && m1_ki && m1_kd && m1_qpps) {
             if (m1_kp.value() < 0.0 || m1_ki.value() < 0.0 || m1_kd.value() < 0.0) {
-                RCLCPP_FATAL(logger, "Motor 1 pid gains must be finite and non-negative!");
+                RCLCPP_FATAL(logger, "Motor 1 pid gains must be finite and non-negative");
                 return hardware_interface::CallbackReturn::ERROR;
             } 
 
             if (m1_qpps.value() == 0) {
-                RCLCPP_FATAL(logger, "Motor 1 qpps cannot be zero!");
+                RCLCPP_FATAL(logger, "Motor 1 qpps cannot be zero");
                 return hardware_interface::CallbackReturn::ERROR;
             }
             VelocityPidSettings settings;
@@ -229,12 +276,12 @@ namespace kait3_roboclaw_hardware {
         std::optional<VelocityPidSettings> m2_pid_settings = std::nullopt;
         if (m2_kp && m2_ki && m2_kd && m2_qpps) {
             if (m2_kp.value() < 0.0 || m2_ki.value() < 0.0 || m2_kd.value() < 0.0) {
-                RCLCPP_FATAL(logger, "Motor 2 pid gains must be finite and non-negative!");
+                RCLCPP_FATAL(logger, "Motor 2 pid gains must be finite and non-negative");
                 return hardware_interface::CallbackReturn::ERROR;
             }
 
             if (m2_qpps.value() == 0) {
-                RCLCPP_FATAL(logger, "Motor 2 qpps cannot be zero!");
+                RCLCPP_FATAL(logger, "Motor 2 qpps cannot be zero");
                 return hardware_interface::CallbackReturn::ERROR;
             }
 
@@ -271,7 +318,7 @@ namespace kait3_roboclaw_hardware {
                max_attempts
             );
         } catch (const std::exception& ex) {
-            RCLCPP_FATAL(logger, "Failed to construct RoboClaw driver object! what(): %s", ex.what());
+            RCLCPP_FATAL(logger, "Failed to construct RoboClaw driver object. what(): %s", ex.what());
             return hardware_interface::CallbackReturn::ERROR;
         }
 
@@ -284,60 +331,17 @@ namespace kait3_roboclaw_hardware {
     ) {
         (void)previous_state;
 
-        auto logger = get_logger();
+        auto logger = this->get_logger();
 
         RCLCPP_INFO(logger, "Configuring hardware...");
-
-        if (RCUTILS_UNLIKELY(roboclaw_driver_ == nullptr)) {
-           RCLCPP_FATAL(logger, "RoboClaw driver instance is null!");
-           return hardware_interface::CallbackReturn::ERROR;
-        }
             
-        RCLCPP_INFO(logger, "Trying to open RoboClaw, device_path: %s", roboclaw_driver_->device_path().c_str());
         try {
+		    RCLCPP_INFO(logger, "Trying to open RoboClaw, device_path: %s", roboclaw_driver_->device_path().c_str());
             roboclaw_driver_->open();
-        } catch (const std::system_error& ex) {
-            RCLCPP_ERROR(
-                logger, 
-                "Failed to open RoboClaw, system error occurred! what(): message=%s code=%d, category=%s",
-                ex.what(),
-                ex.code().value(),
-                ex.code().category().name()
-            );
-            return hardware_interface::CallbackReturn::ERROR;
-        } catch (const std::exception& ex) {
-            RCLCPP_FATAL(logger, "unexpected error occurred! what(): %s", ex.what());
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-        
-        RCLCPP_INFO(logger, "Successfully configured hardware");
 
-        return hardware_interface::CallbackReturn::SUCCESS;
-    }
-    
-
-    hardware_interface::CallbackReturn RoboClawHardware::on_activate(
-        const rclcpp_lifecycle::State& previous_state
-    ) {
-        (void)previous_state;
-        auto logger = get_logger();
-
-        RCLCPP_INFO(logger, "Activating hardware...");
-
-        if (RCUTILS_UNLIKELY(roboclaw_driver_ == nullptr)) {
-            RCLCPP_FATAL(logger, "RoboClaw driver instance is null!");
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-    
-        try {
-            RCLCPP_INFO(logger, "Checking communication with RoboClaw using command 21");
+			RCLCPP_INFO(logger, "Checking communication with RoboClaw using command 21");
             std::string firmware_version = roboclaw_driver_->get_firmware_version();
             RCLCPP_INFO(logger, "RoboClaw communication established, firmware version: %s", firmware_version.c_str());
-
-            RCLCPP_INFO(logger, "Trying to read encoder counts using command 78");
-            auto [enc1_counts, enc2_counts] = roboclaw_driver_->get_encoder_counts();
-            previous_encoder_counts_[0] = enc1_counts;
-            previous_encoder_counts_[1] = enc2_counts;
 
             RCLCPP_INFO(logger, "Trying to set serial timeout using command 14");
             if (specs_.watchdog_timeout_sec.has_value()) {
@@ -382,15 +386,50 @@ namespace kait3_roboclaw_hardware {
                 RCLCPP_INFO(logger, "Parameters are incomplete or unset, skip sending command 29");
             }
 
+        } catch (const std::system_error& ex) {
+            RCLCPP_ERROR(
+                logger, 
+                "Failed to open RoboClaw, system error occurred. what(): message=%s code=%d, category=%s",
+                ex.what(),
+                ex.code().value(),
+                ex.code().category().name()
+            );
+            return hardware_interface::CallbackReturn::ERROR;
+        } catch (const std::exception& ex) {
+            RCLCPP_ERROR(logger, "There was also a problem related to communication. what(): %s", ex.what());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        
+        RCLCPP_INFO(logger, "Successfully configured hardware");
+
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+    
+
+    hardware_interface::CallbackReturn RoboClawHardware::on_activate(
+        const rclcpp_lifecycle::State& previous_state
+    ) {
+        (void)previous_state;
+        auto logger = this->get_logger();
+
+        RCLCPP_INFO(logger, "Activating hardware...");
+    
+        try {
+            RCLCPP_INFO(logger, "Trying to read encoder counts using command 78");
+            auto [enc1_counts, enc2_counts] = roboclaw_driver_->get_encoder_counts();
+            previous_encoder_counts_[0] = enc1_counts;
+            previous_encoder_counts_[1] = enc2_counts;
+            
             set_command("left_wheel_joint/velocity", 0.0);
             set_command("right_wheel_joint/velocity", 0.0);
+            set_command("emergency_stop/active", 1.0);
 
         } catch (const std::exception& ex) {
-            RCLCPP_FATAL(logger, "There was also a problem releted to communication! what(): %s", ex.what());
+            RCLCPP_FATAL(logger, "There was also a problem related to communication. what(): %s", ex.what());
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-        RCLCPP_INFO(logger, "Successfully activeted hardware");
+        RCLCPP_INFO(logger, "Successfully activated hardware");
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -398,18 +437,11 @@ namespace kait3_roboclaw_hardware {
         const rclcpp_lifecycle::State& previuos_state
     ) {
         (void)previuos_state;
-        auto logger = get_logger();
+        auto logger = this->get_logger();
 
         RCLCPP_INFO(logger, "Deactivating hardware...");
 
-        if (RCUTILS_UNLIKELY(roboclaw_driver_ == nullptr)) {
-            RCLCPP_FATAL(logger, "RoboClaw driver instance is null!");
-            return hardware_interface::CallbackReturn::ERROR;
-        }
         try {
-            set_command("left_wheel_joint/velocity", 0.0);
-            set_command("right_wheel_joint/velocity", 0.0);
-
             RCLCPP_INFO(logger, "Trying to stop the motor (freewheeling)");
             roboclaw_driver_->drive_m1_m2_signed_duty_cycle(0, 0);
              
@@ -430,11 +462,6 @@ namespace kait3_roboclaw_hardware {
 
         RCLCPP_INFO(logger, "Cleaning up hardware...");
 
-        if (RCUTILS_UNLIKELY(roboclaw_driver_ == nullptr)) {
-            RCLCPP_FATAL(logger, "RoboClaw driver instance is null!");
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-
         roboclaw_driver_->close();
         RCLCPP_INFO(logger, "Successfully cleaned up hardware");
         return hardware_interface::CallbackReturn::SUCCESS;    
@@ -448,10 +475,6 @@ namespace kait3_roboclaw_hardware {
 
         RCLCPP_INFO(logger, "Shutting down hardware...");
 
-        if (RCUTILS_UNLIKELY(roboclaw_driver_ != nullptr)) {
-            RCLCPP_FATAL(logger, "RoboClaw driver instance is null!");
-            return hardware_interface::CallbackReturn::ERROR;
-        }
         roboclaw_driver_->close();
     
         RCLCPP_INFO(logger, "Successfully shut down hardware");
@@ -462,11 +485,6 @@ namespace kait3_roboclaw_hardware {
         const rclcpp_lifecycle::State& previous_state
     ) {
         auto logger = get_logger();
-
-        if (RCUTILS_UNLIKELY(roboclaw_driver_ == nullptr)) {
-            RCLCPP_FATAL(logger, "RoboClaw driver instance is null!");
-            return hardware_interface::CallbackReturn::ERROR;
-        }
 
         RCLCPP_ERROR(logger, "Error raised in %s, transitioning to Unconfigured state", previous_state.label().c_str());
         roboclaw_driver_->close();
@@ -481,8 +499,6 @@ namespace kait3_roboclaw_hardware {
         (void)time;
         (void)period;
         
-        auto logger = get_logger();
-
         try {
             auto [left_encoder_counts, right_encoder_counts] = roboclaw_driver_->get_encoder_counts();
             
@@ -508,7 +524,7 @@ namespace kait3_roboclaw_hardware {
             set_state("right_wheel_joint/velocity", right_vel);
 
         } catch(const std::exception& ex) {
-            RCLCPP_FATAL(logger, "There was a problem releted to communication! what(): %s", ex.what());
+            RCLCPP_ERROR(this->get_logger(), "There was a problem releted to communication. what(): %s", ex.what());
             return hardware_interface::return_type::ERROR;
         }
 
@@ -522,16 +538,46 @@ namespace kait3_roboclaw_hardware {
         (void)time;
         (void)period;
 
-        auto logger = get_logger();
-
         try {
+            bool e_stop_active = get_command("emergency_stop/active") >= 0.5;
+            if (e_stop_active) {
+            	/**
+                 * NOTE:
+                 *
+                 * During an emergency stop, the motor power is cut off, resulting in freewheeling.
+				 * However, if a velocity command is sent in this state, even slight movement could
+				 * cause an accumulation of integral values, potentially leading to a sudden
+				 * acceleration after the emergency stop is released. Therefore, during an emergency 
+				 * stop, a zero duty cycle command is sent to prevent the accumulation of integral values.
+				*/
+                roboclaw_driver_->drive_m1_m2_signed_duty_cycle(0, 0);
+                wait_for_zero_velocity_after_e_stop_ = true;
+                return hardware_interface::return_type::OK;
+            }
+
             double left_vel = get_command("left_wheel_joint/velocity");
             double right_vel = get_command("right_wheel_joint/velocity");
+
+            if (wait_for_zero_velocity_after_e_stop_) {
+                if (std::abs(left_vel) <= 1.0e-3 && std::abs(right_vel) <= 1.0e-3) {
+                    wait_for_zero_velocity_after_e_stop_ = false;
+                } else {
+                    left_vel = 0.0;
+                    right_vel = 0.0;
+
+                    RCLCPP_DEBUG_THROTTLE(
+                        this->get_logger(),
+                        *this->get_clock(),
+                        1000,
+                        "Waiting for zero velocity commands after emergency stop release"
+                    );
+                }
+            }
 
             write_velocity(left_vel, right_vel);
        
         } catch (const std::exception& ex) {
-            RCLCPP_FATAL(logger, "There was a problem releted to communication! what(): %s", ex.what());
+            RCLCPP_FATAL(get_logger(), "There was a problem related to communication. what(): %s", ex.what());
             return hardware_interface::return_type::ERROR;
         }
         return hardware_interface::return_type::OK;
