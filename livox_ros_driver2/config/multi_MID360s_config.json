@@ -45,7 +45,7 @@
       "pattern_mode" : 0,
       "lidar_topic_name": "livox/rear/pointcloud",
       "imu_topic_name": "/livox/rear/imu",
-      "lidar_frame_id": "rear_livox_link",
+      "lidar_frame_id": "rear_lidar_link",
       "imu_frame_id": "rear_imu_link",
       "extrinsic_parameter" : {
         "roll": 0.0,
